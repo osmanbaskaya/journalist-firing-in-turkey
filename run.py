@@ -40,18 +40,21 @@ def update_graph(api, graph_id, signals):
     api.update_graph(id=graph_id, signals=signals)
 
 
-def create_from_txt(api):
-    print api
-    print api.status()
+def parse_data_file(fn):
+    pass
+
+def create_from_txt(api, input_file):
+    parsed_data = parse_data_file(input_file)
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--developer-key', required=True)
+    parser.add_argument('--input-file', required=True)
 
     args = parser.parse_args()
 
     api = GraphCommons(args.developer_key)
     api.status()
-    create_from_txt(api)
+    create_from_txt(api, args.input_file)
