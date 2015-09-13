@@ -66,14 +66,14 @@ def create_from_txt(api,inputpar):
     return graph_id
 
 if __name__ == '__main__':
-    inputpar = 0    
-    if len(sys.argv)>1:
-        inputpar = sys.argv[1]
-    api = GraphCommons('sk_6kqypUWIO3ywEe709DXJCQ')
-    print create_from_txt(api,inputpar)
-    print api.status()
-    
-    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--developer-key', required=True)
+    parser.add_argument('--input-file', required=True)
 
-    
-   
+    args = parser.parse_args()
+
+    api = GraphCommons(args.developer_key)
+    print create_from_txt(api, args.input_file)
+    print api.status()
+
+# to run this script: python run.py --developer-key <YOUR_DEV_KEY> --input-file <INPUT_FILE (tab separated file)>
