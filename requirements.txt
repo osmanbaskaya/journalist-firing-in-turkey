@@ -1,2 +1,4 @@
 graphcommons
 twitterapi
+unidecode
+ujson
