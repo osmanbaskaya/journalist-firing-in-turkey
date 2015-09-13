@@ -12,15 +12,6 @@ URL = "https://stream.twitter.com/1.1/statuses/filter.json"
 def decode(string):
     return unidecode.unidecode(string)
 
-def request_params(keys, language):
-    parameter_keys = ','.join(keys)
-    params = {
-        'track': parameter_keys,
-        #'language': language,
-        'stall_warnings': True,
-    }
-    return params
-
 
 def stream(consumer_key, consumer_secret, access_token, access_token_secret, 
            keys, language):
