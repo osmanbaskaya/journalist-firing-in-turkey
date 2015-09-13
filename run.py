@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 __author__ = "Osman Baskaya"
 
+import graphcommons
 from graphcommons import GraphCommons, Signal
 import argparse
+import cleanupcsv
+import sys
 
 
 def create_edge(from_node, to_node, relation_type, to_type, from_type):
@@ -26,8 +29,7 @@ def create_node(node_name, node_type, description=""):
             ("type", node_type), 
             ("description", description),
             ("properties", {})]
-
-    return dict(base)
+    
 
 
 def create_empty_graph(api, graph_name, description=""):
@@ -40,21 +42,38 @@ def update_graph(api, graph_id, signals):
     api.update_graph(id=graph_id, signals=signals)
 
 
-def parse_data_file(fn):
-    pass
+def create_from_txt(api,inputpar):
+    print api
+    print api.status()
+    [journonodes,papernodes,edges]=cleanupcsv.parsecsv()
+    if inputpar == 0:
+        graph_id = create_empty_graph(api, "Fired Journalists")
+        print graph_id 
+    else:
+        graph_id = inputpar
+    for element in journonodes:
+       
+        api.update_graph(graph_id,signals=[Signal(action="node_create",name=element[0],type=element[1],description=element[2])])
+        
+       
+    for element in papernodes:
+        api.update_graph(graph_id,signals=[Signal(action="node_create",name=element[0],type=element[1],description=element[2])])
 
-def create_from_txt(api, input_file):
-    parsed_data = parse_data_file(input_file)
-
+    
+    for element in edges:
+        api.update_graph(graph_id,signals=[Signal(action="edge_create",from_name=element[0],from_type=element[1],to_name=element[2],to_type=element[3],name=element[4])])
+    
+    return graph_id
 
 if __name__ == '__main__':
+    inputpar = 0    
+    if len(sys.argv)>1:
+        inputpar = sys.argv[1]
+    api = GraphCommons('sk_6kqypUWIO3ywEe709DXJCQ')
+    print create_from_txt(api,inputpar)
+    print api.status()
+    
+    
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--developer-key', required=True)
-    parser.add_argument('--input-file', required=True)
-
-    args = parser.parse_args()
-
-    api = GraphCommons(args.developer_key)
-    api.status()
-    create_from_txt(api, args.input_file)
+    
+   
