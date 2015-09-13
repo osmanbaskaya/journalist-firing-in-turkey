@@ -6,9 +6,9 @@ Todoes : Find a python module that imports and exports csv files
 Generate three sets of nodes : Journalists, news outlets and reason 
 For each line in the excel sheet, generate 3 edges
 """
-def parsecsv():
+def parsecsv(input_file):
     import csv
-    f = open("../journalist-firing-in-turkey/fakedata.csv","rb")
+    f = open(input_file, "rb")
     dataarray = csv.reader(f,delimiter='\t')
     
     next(dataarray)

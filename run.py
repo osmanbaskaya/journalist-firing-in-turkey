@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 __author__ = "Osman Baskaya"
 
-import graphcommons
 from graphcommons import GraphCommons, Signal
 import argparse
-import cleanupcsv
-import sys
-
+import dataread
+from itertools import chain
 
 def create_edge(from_node, to_node, relation_type, to_type, from_type):
 
@@ -29,6 +27,8 @@ def create_node(node_name, node_type, description=""):
             ("type", node_type), 
             ("description", description),
             ("properties", {})]
+
+    return dict(base)
     
 
 
@@ -39,36 +39,43 @@ def create_empty_graph(api, graph_name, description=""):
 
 
 def update_graph(api, graph_id, signals):
+    print "Updating graph %s" % graph_id
     api.update_graph(id=graph_id, signals=signals)
 
 
-def create_from_txt(api,inputpar):
-    print api
-    print api.status()
-    [journonodes,papernodes,edges]=cleanupcsv.parsecsv()
-    if inputpar == 0:
-        graph_id = create_empty_graph(api, "Fired Journalists")
-        print graph_id 
-    else:
-        graph_id = inputpar
-    for element in journonodes:
-       
-        api.update_graph(graph_id,signals=[Signal(action="node_create",name=element[0],type=element[1],description=element[2])])
-        
-       
-    for element in papernodes:
-        api.update_graph(graph_id,signals=[Signal(action="node_create",name=element[0],type=element[1],description=element[2])])
+def create_from_txt(api, input_file, graph_id=None):
 
+    journalists, newspapers, reasons, edges = dataread.parsetsv(input_file)
+    if graph_id is None:
+        graph_id = create_empty_graph(api, "Fired Journalists")
+        print "Graph created: {}".format(graph_id)
+
+    print "Processing {}".format(graph_id)
     
+    signals = []
+    total_num_node = 0
+    for element in chain(journalists, newspapers, reasons):
+        node = create_node(**dict(element))
+        signals.append(Signal(**node))
+        total_num_node += 1
+
+    print "Total # of node: %d" % total_num_node
+
+    update_graph(api, graph_id, signals)
+    
+    signals = []
     for element in edges:
-        api.update_graph(graph_id,signals=[Signal(action="edge_create",from_name=element[0],from_type=element[1],to_name=element[2],to_type=element[3],name=element[4])])
+        edge = create_edge(**dict(element))
+        signals.append(Signal(**edge))
     
+    update_graph(api, graph_id, signals)
     return graph_id
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--developer-key', required=True)
     parser.add_argument('--input-file', required=True)
+    parser.add_argument('--graph-id')
 
     args = parser.parse_args()
 
