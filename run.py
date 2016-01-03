@@ -7,7 +7,12 @@ import argparse
 import dataread
 from itertools import chain
 
-def create_edge(from_node, to_node, relation_type, to_type, from_type):
+def create_edge(from_node, to_node, relation_type, to_type, from_type, properties=None):
+
+    if properties is not None:
+        properties = dict([properties])
+    else:
+        properties = {}
 
     base = [("action", "edge_create"), 
             ("from_name", from_node), 
@@ -15,7 +20,7 @@ def create_edge(from_node, to_node, relation_type, to_type, from_type):
             ("to_name", to_node), 
             ("to_type", to_type), 
             ("name", relation_type), 
-            ("properties", {})]
+            ("properties", properties)]
 
     return dict(base)
 
@@ -45,16 +50,16 @@ def update_graph(api, graph_id, signals):
 
 def create_from_txt(api, input_file, graph_id=None):
 
-    journalists, newspapers, reasons, edges = dataread.parsetsv(input_file)
+    journalists, newspapers, edges = dataread.get_data(input_file)
     if graph_id is None:
-        graph_id = create_empty_graph(api, "Fired Journalists")
+        graph_id = create_empty_graph(api, "Fired Journalists in Turkey after 2013")
         print "Graph created: {}".format(graph_id)
 
     print "Processing {}".format(graph_id)
     
     signals = []
     total_num_node = 0
-    for element in chain(journalists, newspapers, reasons):
+    for element in chain(journalists, newspapers):
         node = create_node(**dict(element))
         signals.append(Signal(**node))
         total_num_node += 1
