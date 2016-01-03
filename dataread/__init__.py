@@ -5,26 +5,6 @@ import pandas as pd
 import datetime
 
 
-def parsetsv(input_file):
-    f = codecs.open(input_file, encoding='utf-8')
-    journalists = set()
-    newspapers = set()
-    edges = set()
-    f.readline()
-    for line in f:
-        line = line.strip().split('\t')
-        journalists.add((('node_name', line[0]), ('node_type', "Journalist"), ("description", "")))
-        newspapers.add((('node_name', line[1]), ('node_type', "Journal"), ("description", "")))
-        newspapers.add((('node_name', line[4]), ('node_type', "Journal"), ("description", "")))
-
-        reasons.add((("node_name", relation_type), ("node_type", "Sebep"), ("description", "")))
-        edges.add((("from_node", line[1]), ("to_node", line[0]), ("relation_type", "Eski iş"), ("from_type", "Gazete"), ("to_type", "Gazeteci")))
-
-        edges.add((("from_node", line[0]), ("to_node", line[4]), ("relation_type", "Yeni iş"), ("from_type", "Gazeteci"), ("to_type", "Gazete")))
-        edges.add((("from_node", line[1]), ("to_node", relation_type), ("relation_type", "Eylem"), ("from_type", "Gazete"), ("to_type", "Sebep")))
-    return journalists, newspapers, reasons, edges
-
-
 def get_data(input_file, sep='\t'):
     media_df = pd.read_csv("media_types.tsv", sep='\t')
     media_type = dict(zip(media_df.MediaEntity, media_df.Type))
